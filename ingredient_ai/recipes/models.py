@@ -41,10 +41,7 @@ class RecipeModel(TimeStampedModel):
     cooking_time = models.CharField(max_length=16)
     serving_size = models.CharField(max_length=16)
     description = models.TextField()
-    ingredients = models.ManyToManyField(
-        IngredientModel,
-        related_name='recipes'
-    )
+    ingredients = models.TextField()
     instructions = models.TextField()
 
     def __str__(self):
