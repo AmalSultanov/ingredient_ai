@@ -36,10 +36,10 @@ class IngredientModel(TimeStampedModel):
 
 
 class RecipeModel(TimeStampedModel):
-    image = models.ImageField(upload_to='recipes')
+    image = models.ImageField(upload_to='recipes', null=True, blank=True)
     name = models.CharField(max_length=64)
-    cooking_time = models.PositiveSmallIntegerField()
-    serving_size = models.PositiveSmallIntegerField()
+    cooking_time = models.CharField(max_length=16)
+    serving_size = models.CharField(max_length=16)
     description = models.TextField()
     ingredients = models.ManyToManyField(
         IngredientModel,
