@@ -5,6 +5,7 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('users/', include('ingredient_ai.users.urls', namespace='users')),
     path('', include('ingredient_ai.recipes.urls', namespace='recipes'))
 ]
 
