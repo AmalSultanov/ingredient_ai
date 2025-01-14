@@ -17,7 +17,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'ingredient_ai.recipes'
+    'ingredient_ai.recipes',
+    'ingredient_ai.users'
 ]
 
 MIDDLEWARE = [
