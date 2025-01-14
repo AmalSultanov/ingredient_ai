@@ -89,4 +89,7 @@ STATICFILES_DIRS = [BASE_DIR / 'ingredient_ai/assets']
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'ingredient_ai/media'
 
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
