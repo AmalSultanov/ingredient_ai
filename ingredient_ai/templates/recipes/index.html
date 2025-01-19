@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+    <div class="container-fluid">
+        <h1 class="text-center mb-4">Categories and Ingredients</h1>
+        <form method="POST" action="{% url 'recipes:recipes' %}" id="ingredients-form">
+            {% csrf_token %}
+            <div class="row row-cols-1 row-cols-md-2">
+                {% for category in categories_with_ingredients %}
+                    <div class="col mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h2 class="card-title mb-3">{{ category.name }}</h2>
+                                <p class="card-text">
+                                    {% for ingredient in category.ingredients.all %}
+                                        <label class="form-check-label my-2 me-2">
+                                            <input type="checkbox"
+                                                   name="ingredient"
+                                                   value="{{ ingredient.name }}"
+                                                   class="form-check-input">
+                                            <span class="badge bg-success fs-6">{{ ingredient.name }}</span>
+                                        </label>
+                                    {% endfor %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <button type="submit" class="btn btn-primary mt-3">Get recipes</button>
+        </form>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('ingredients-form').addEventListener('submit', function(event) {
+        const checkboxes = document.querySelectorAll('input[name="ingredient"]:checked');
+        if (checkboxes.length === 0) {
+            event.preventDefault();
+            alert('Please select at least one ingredient before submitting.');
+        }
+    });
+</script>
+{% endblock %}
