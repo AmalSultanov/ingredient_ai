@@ -19,7 +19,6 @@ def get_recipes(request):
     if request.method == 'POST':
         selected_ingredients = request.POST.getlist('ingredient')
         request.session['selected_ingredients'] = selected_ingredients
-        print(f'from view: {request.session['selected_ingredients']}')
     else:
         selected_ingredients = request.session.get('selected_ingredients', [])
 
