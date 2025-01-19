@@ -5,11 +5,15 @@ from django.urls import reverse
 class ClearRecipeCacheMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
+        self.recipes_url = reverse('recipes:recipes')
 
     def __call__(self, request):
+        if not request.user.id:
+            return self.get_response(request)
+
         user_cache_key = f'user_recipes_key_{request.user.id}'
 
-        if request.path == reverse('recipes:recipes'):
+        if request.method == 'POST' and request.path == self.recipes_url:
             selected_ingredients = request.POST.getlist('ingredient')
             ingredients = '_'.join(selected_ingredients).lower()
             cache_key = f'recipes_with_{ingredients}_by_{request.user.id}'
@@ -31,11 +35,11 @@ class ClearIngredientsMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        if 'selected_ingredients' in request.session:
+        if request.session.get('selected_ingredients', None):
             if not (
-                request.path == reverse('recipes:recipes') or
-                request.path == reverse('users:add_to_wishlist') or
-                request.path == reverse('users:delete_from_wishlist')
+                    request.path == reverse('recipes:recipes') or
+                    request.path.startswith('/users/add') or
+                    request.path.startswith('/users/delete')
             ):
                 request.session.pop('selected_ingredients', None)
 
