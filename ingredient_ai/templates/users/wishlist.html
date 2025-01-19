@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Wishlist{% endblock %}
+
+{% block content %}
+    <div class="container-fluid">
+        <h1 class="text-center mb-4">Wishlist</h1>
+        <div class="row">
+            {% for recipe in wishlist_recipes %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        {% if recipe.image %}
+                            <img src="{{ recipe.image.url }}" class="card-img-top" alt="{{ recipe.name }}">
+                        {% else %}
+                            <img src="https://placehold.co/600x400" class="card-img-top" alt="Placeholder image">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title d-flex justify-content-between align-items-center">
+                                {{ recipe.name }}
+                                <a class="btn btn-link text-danger p-0" href="{% url 'users:delete_from_wishlist' pk=recipe.pk %}?next={{ request.path }}">
+                                    <i class="bi bi-heart-fill"></i>
+                                </a>
+                            </h5>
+                            <p class="card-text"><strong>Cooking Time:</strong> {{ recipe.cooking_time }}</p>
+                            <p class="card-text"><strong>Serving Size:</strong> {{ recipe.serving_size }}</p>
+                            <p class="card-text text-truncate" style="max-width: 300px;"><strong>Description:</strong> {{ recipe.description }}</p>
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#recipeModal{{ recipe.id }}">
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="recipeModal{{ recipe.id }}" tabindex="-1" aria-labelledby="recipeModalLabel{{ recipe.id }}" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="recipeModalLabel{{ recipe.id }}">{{ recipe.name }}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p><strong>Cooking Time:</strong> {{ recipe.cooking_time }}</p>
+                                <p><strong>Serving Size:</strong> {{ recipe.serving_size }}</p>
+                                <p><strong>Description:</strong> {{ recipe.description }}</p>
+                                <p><strong>Ingredients:</strong></p>
+                                <ul>
+                                    {% for ingredient in recipe.ingredients.splitlines %}
+                                        <li>{{ ingredient }}</li>
+                                    {% endfor %}
+                                </ul>
+                                <p><strong>Instructions:</strong></p>
+                                <ol>
+                                    {% for instruction in recipe.instructions.splitlines %}
+                                        <li>{{ instruction }}</li>
+                                    {% endfor %}
+                                </ol>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <p>No recipes, you can add a recipe by clicking <i class="bi bi-heart-fill"></i></p>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
