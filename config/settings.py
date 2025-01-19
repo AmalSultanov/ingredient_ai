@@ -32,6 +32,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'ingredient_ai.recipes.middleware.ClearRecipeCacheMiddleware',
+    'ingredient_ai.recipes.middleware.ClearIngredientsMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
