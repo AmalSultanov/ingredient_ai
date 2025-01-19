@@ -24,3 +24,22 @@ def registration_view(request):
     context = {'form': form}
 
     return render(request, 'users/registration/registration.html', context)
+
+
+def add_to_wishlist_view(request, pk):
+    add_to_wishlist(request.user.id, pk)
+
+    return redirect(request.GET.get('next', '/'))
+
+
+def delete_from_wishlist_view(request, pk):
+    delete_from_wishlist(request.user.id, pk)
+
+    return redirect(request.GET.get('next', '/'))
+
+
+def get_wishlist_view(request):
+    wishlist_recipes = get_wishlist(request.user.id)
+    context = {'wishlist_recipes': wishlist_recipes}
+
+    return render(request, 'users/wishlist.html', context)
