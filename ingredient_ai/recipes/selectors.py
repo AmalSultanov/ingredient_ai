@@ -16,3 +16,7 @@ def get_recipes_by_ingredients(selected_ingredients):
         query |= Q(ingredients__icontains=ingredient)
 
     return RecipeModel.objects.filter(query).distinct()
+
+
+def get_recipes_by_ids(recipe_ids):
+    return RecipeModel.objects.filter(id__in=recipe_ids)
