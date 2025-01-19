@@ -1,5 +1,7 @@
 from django.core.cache import caches
 
+from ingredient_ai.recipes.selectors import get_recipes_by_ids
+
 wishlist_cache = caches['wishlist']
 
 
@@ -19,5 +21,14 @@ def delete_from_wishlist(user_id, recipe_id):
 
 def get_wishlist(user_id):
     key = f'wishlist_{user_id}'
+    wishlist_recipes_ids = wishlist_cache.get(key, set())
+    wishlist_recipes = get_recipes_by_ids(wishlist_recipes_ids)
 
-    return wishlist_cache.get(key, set())
+    return wishlist_recipes
+
+
+def get_user_wishlist_ids(user_id):
+    key = f'wishlist_{user_id}'
+    wishlist_recipes_ids = wishlist_cache.get(key, set())
+
+    return wishlist_recipes_ids
