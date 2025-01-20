@@ -1,40 +1,27 @@
-from django.core.cache import cache
 from django.shortcuts import render
 
-from .selectors import (
-    get_categories_with_ingredients,
-    get_recipes_by_ingredients
-)
-from .services import generate_and_save_recipes
+from .selectors import get_categories_with_ingredients
+from .services import get_recipes
 
 
-def get_ingredients(request):
+def get_ingredients_view(request):
     categories_with_ingredients = get_categories_with_ingredients()
     context = {'categories_with_ingredients': categories_with_ingredients}
 
     return render(request, 'recipes/index.html', context)
 
 
-def get_recipes(request):
+def get_recipes_view(request):
     if request.method == 'POST':
-        selected_ingredients = request.POST.getlist('ingredient')
-        request.session['selected_ingredients'] = selected_ingredients
-    else:
-        selected_ingredients = request.session.get('selected_ingredients', [])
-
-    if selected_ingredients:
-        ingredients = '_'.join(selected_ingredients).lower()
-        cache_key = f'recipes_with_{ingredients}_by_{request.user.id}'
-        cached_recipes = cache.get(cache_key)
-
-        if cached_recipes is None:
-            generate_and_save_recipes(selected_ingredients)
-            recipes = get_recipes_by_ingredients(selected_ingredients)
-
-            cache.set(cache_key, recipes, timeout=None)
+        if request.session.get('selected_ingredients'):
+            selected_ingredients = request.session.get('selected_ingredients')
         else:
-            recipes = cached_recipes
+            selected_ingredients = request.POST.getlist('ingredient')
+            request.session['selected_ingredients'] = selected_ingredients
+    else:
+        selected_ingredients = request.session.get('selected_ingredients')
 
-        context = {'recipes': recipes}
+    recipes = get_recipes(request.user.id, selected_ingredients)
+    context = {'recipes': recipes}
 
-        return render(request, 'recipes/recipes.html', context)
+    return render(request, 'recipes/recipes.html', context)
