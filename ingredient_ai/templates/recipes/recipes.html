@@ -18,7 +18,7 @@
                         <div class="card-body">
                             <h5 class="card-title d-flex justify-content-between align-items-center">
                                 {{ recipe.name }}
-                                <a class="btn btn-link text-danger p-0" href="{% if recipe.pk in user_wishlist %}{% url 'users:delete_from_wishlist' pk=recipe.pk %}{% else %}{% url 'users:add_to_wishlist' pk=recipe.pk %}{% endif %}?next={{ request.path }}#recipe_{{ recipe.pk }}">
+                                <a class="btn btn-link text-danger p-0" href="{% if recipe.pk in user_wishlist_ids %}{% url 'users:delete_from_wishlist' pk=recipe.pk %}{% else %}{% url 'users:add_to_wishlist' pk=recipe.pk %}{% endif %}?next={{ request.path }}#recipe_{{ recipe.pk }}">
                                     <i class="bi {% if recipe.pk in user_wishlist_ids %}bi-heart-fill{% else %}bi-heart{% endif %}"></i>
                                 </a>
                             </h5>
