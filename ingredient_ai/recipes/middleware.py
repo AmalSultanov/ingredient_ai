@@ -19,11 +19,13 @@ class ClearRecipeCacheMiddleware:
             cache_key = f'recipes_with_{ingredients}_by_{request.user.id}'
 
             cache.set(user_cache_key, cache_key)
-        else:
-            cache_key = cache.get(user_cache_key)
-
-            if cache_key:
-                cache.delete(cache_key)
+        elif not (
+                request.path == self.recipes_url or
+                request.path.startswith('/users/add') or
+                request.path.startswith('/users/delete')
+        ):
+            if cache.get(user_cache_key):
+                cache.delete(cache.get(user_cache_key))
                 cache.delete(user_cache_key)
 
         response = self.get_response(request)
