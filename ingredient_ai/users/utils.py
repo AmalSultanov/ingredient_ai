@@ -29,6 +29,5 @@ def get_wishlist(user_id):
 
 def get_user_wishlist_ids(user_id):
     key = f'wishlist_{user_id}'
-    wishlist_recipes_ids = wishlist_cache.get(key, set())
 
-    return wishlist_recipes_ids
+    return wishlist_cache.get(key, set())
