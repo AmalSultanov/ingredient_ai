@@ -1,8 +1,10 @@
 import json
 
+from django.core.cache import cache
 from ollama import chat
 
 from .models import RecipeModel
+from .selectors import get_recipes_by_ingredients
 from .utils import get_prompt_file
 
 
@@ -65,3 +67,17 @@ def create_recipe(
     )
 
     return recipe
+
+
+def get_recipes(user_id, selected_ingredients):
+    ingredients = '_'.join(selected_ingredients).lower()
+    cache_key = f'recipes_with_{ingredients}_by_{user_id}'
+    recipes = cache.get(cache_key)
+
+    if recipes is None:
+        generate_and_save_recipes(selected_ingredients)
+        recipes = get_recipes_by_ingredients(selected_ingredients)
+
+        cache.set(cache_key, recipes, timeout=None)
+
+    return recipes
