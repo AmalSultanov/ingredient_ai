@@ -36,7 +36,7 @@ class ClearIngredientsMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        if request.session.get('selected_ingredients', None):
+        if 'selected_ingredients' in request.session:
             if not (
                     request.path == reverse('recipes:recipes') or
                     request.path.startswith('/users/add') or
