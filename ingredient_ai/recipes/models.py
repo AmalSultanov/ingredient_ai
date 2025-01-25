@@ -1,3 +1,7 @@
+from io import BytesIO
+
+from PIL import Image
+from django.core.files.base import ContentFile
 from django.db import models
 
 
@@ -43,6 +47,16 @@ class RecipeModel(TimeStampedModel):
     description = models.TextField()
     ingredients = models.TextField()
     instructions = models.TextField()
+
+    def save(self, *args, **kwargs):
+        if self.image:
+            img = Image.open(self.image)
+            img = img.convert('RGB')
+            output = BytesIO()
+            img.save(output, format='JPEG', quality=70)
+            output.seek(0)
+            self.image = ContentFile(output.read(), self.image.name)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
