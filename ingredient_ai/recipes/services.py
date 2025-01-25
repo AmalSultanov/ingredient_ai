@@ -1,6 +1,7 @@
 import json
 
 from django.core.cache import cache
+from django.db.models import QuerySet
 from ollama import chat
 
 from .models import RecipeModel
@@ -8,14 +9,14 @@ from .selectors import get_recipes_by_ingredients
 from .utils import get_prompt_file
 
 
-def generate_and_save_recipes(selected_ingredients):
+def generate_and_save_recipes(selected_ingredients: list[str]) -> None:
     prompt = get_prompt_file()
     response = get_ai_response(prompt + ', '.join(selected_ingredients))
 
     save_generated_recipes(response)
 
 
-def get_ai_response(prompt):
+def get_ai_response(prompt: str) -> str:
     response = chat(
         model='llama3.2:1b',
         messages=[{
@@ -28,7 +29,7 @@ def get_ai_response(prompt):
     return content
 
 
-def save_generated_recipes(response):
+def save_generated_recipes(response: str) -> None:
     recipes_data = json.loads(response)
 
     for recipe_data in recipes_data.get('recipes', []):
@@ -40,23 +41,24 @@ def save_generated_recipes(response):
         instructions = '\n'.join(recipe_data.get('instructions', []))
 
         create_recipe(
-            name,
-            cooking_time,
-            serving_size,
-            description,
-            ingredients,
-            instructions
+            name=name,
+            cooking_time=cooking_time,
+            serving_size=serving_size,
+            description=description,
+            ingredients=ingredients,
+            instructions=instructions
         )
 
 
 def create_recipe(
-        name,
-        cooking_time,
-        serving_size,
-        description,
-        ingredients,
-        instructions
-):
+        *,
+        name: str,
+        cooking_time: str,
+        serving_size: str,
+        description: str,
+        ingredients: str,
+        instructions: str
+) -> RecipeModel:
     recipe = RecipeModel.objects.create(
         name=name,
         cooking_time=cooking_time,
@@ -69,7 +71,11 @@ def create_recipe(
     return recipe
 
 
-def get_recipes(user_id, selected_ingredients):
+def get_recipes(
+        *,
+        user_id: int,
+        selected_ingredients: list[str]
+) -> QuerySet[RecipeModel]:
     if user_id is not None:
         ingredients = '_'.join(selected_ingredients).lower()
         cache_key = f'recipes_with_{ingredients}_by_{user_id}'
