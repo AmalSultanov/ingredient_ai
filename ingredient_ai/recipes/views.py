@@ -21,7 +21,8 @@ def get_recipes_view(request):
     else:
         selected_ingredients = request.session.get('selected_ingredients')
 
-    recipes = get_recipes(request.user.id, selected_ingredients)
+    recipes = get_recipes(user_id=request.user.id,
+                          selected_ingredients=selected_ingredients)
     context = {'recipes': recipes}
 
     return render(request, 'recipes/recipes.html', context)
