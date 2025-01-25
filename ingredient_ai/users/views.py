@@ -3,7 +3,7 @@ from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect, render
 
 from .forms import RegistrationForm
-from .utils import add_to_wishlist, delete_from_wishlist, get_wishlist
+from .services import add_to_wishlist, delete_from_wishlist, get_wishlist
 
 
 class CustomLoginView(LoginView):

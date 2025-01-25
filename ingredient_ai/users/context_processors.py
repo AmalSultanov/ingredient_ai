@@ -1,4 +1,4 @@
-from .utils import get_user_wishlist_ids
+from .services import get_user_wishlist_ids
 
 
 def wishlist_context(request):
