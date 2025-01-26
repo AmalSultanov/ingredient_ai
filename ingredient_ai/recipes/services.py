@@ -1,6 +1,8 @@
 import json
 
+from django.contrib.sessions.backends.db import SessionStore
 from django.core.cache import cache
+from django.core.handlers.wsgi import WSGIRequest
 from django.db.models import QuerySet
 from ollama import chat
 
@@ -69,6 +71,16 @@ def create_recipe(
     )
 
     return recipe
+
+
+def get_selected_ingredients(session: SessionStore) -> list[str]:
+    return session.get('selected_ingredients', [])
+
+
+def set_selected_ingredients(request: WSGIRequest) -> None:
+    if 'selected_ingredients' not in request.session:
+        selected_ingredients = request.POST.getlist('ingredient')
+        request.session['selected_ingredients'] = selected_ingredients
 
 
 def get_recipes(
