@@ -8,7 +8,7 @@ class ClearRecipeCacheMiddleware:
         self.recipes_url = reverse('recipes:recipes')
 
     def __call__(self, request):
-        if not request.user.id:
+        if not request.user.is_authenticated:
             return self.get_response(request)
 
         user_cache_key = f'user_recipes_key_{request.user.id}'
