@@ -42,7 +42,7 @@ class IngredientModel(TimeStampedModel):
 
 class RecipeModel(TimeStampedModel):
     image = models.ImageField(upload_to='recipes', null=True, blank=True)
-    name = models.CharField(max_length=64)
+    name = models.CharField(max_length=64, unique=True)
     cooking_time = models.CharField(max_length=16)
     serving_size = models.CharField(max_length=16)
     description = models.TextField()
