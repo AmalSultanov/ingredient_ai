@@ -3,6 +3,7 @@ from io import BytesIO
 from PIL import Image
 from django.core.files.base import ContentFile
 from django.db import models
+from django.utils.text import slugify
 
 
 class TimeStampedModel(models.Model):
@@ -52,10 +53,14 @@ class RecipeModel(TimeStampedModel):
         if self.image:
             img = Image.open(self.image)
             img = img.convert('RGB')
+
+            image_name = f'{slugify(self.name)}.jpg'
+
             output = BytesIO()
             img.save(output, format='JPEG', quality=70)
             output.seek(0)
-            self.image = ContentFile(output.read(), self.image.name)
+
+            self.image = ContentFile(output.read(), image_name)
         super().save(*args, **kwargs)
 
     def __str__(self):
