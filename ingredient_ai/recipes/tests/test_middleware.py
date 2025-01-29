@@ -38,6 +38,7 @@ class ClearRecipeCacheMiddlewareTestCase(TestCase):
         self.assertIsNone(cache.get(user_cache_key))
 
     def tearDown(self):
+        User.objects.first().delete()
         cache.clear()
 
 
@@ -50,7 +51,7 @@ class ClearIngredientsMiddlewareTestCase(TestCase):
     def test_clear_selected_ingredients_in_session_on_non_recipes_page(self):
         self.client.session['selected_ingredients'] = ['tomato', 'cheese']
         self.client.session.save()
-        response = self.client.get(reverse('admin:index'))
+        response = self.client.get(reverse('recipes:ingredients'))
 
         self.assertNotIn('selected_ingredients', self.client.session)
 
@@ -73,7 +74,8 @@ class ClearIngredientsMiddlewareTestCase(TestCase):
         self.assertNotIn('selected_ingredients', self.client.session)
 
     def tearDown(self):
-        self.client.cookies.clear()
+        User.objects.first().delete()
+        self.client.session.flush()
 
 
 if __name__ == '__main__':
