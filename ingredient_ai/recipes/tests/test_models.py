@@ -32,6 +32,9 @@ class IngredientCategoryModelTestCase(TestCase):
         self.assertEqual(self.category.name, 'Vegetables')
         self.assertIsNotNone(self.category.pk)
 
+    def tearDown(self):
+        IngredientCategoryModel.objects.first().delete()
+
 
 class IngredientModelTestCase(TestCase):
     def setUp(self):
@@ -44,6 +47,9 @@ class IngredientModelTestCase(TestCase):
 
         fetched_ingredient = IngredientModel.objects.get(pk=ingredient.pk)
         self.assertEqual(fetched_ingredient.name, ingredient.name)
+
+    def tearDown(self):
+        IngredientModel.objects.all().first().delete()
 
 
 class RecipeModelTestCase(TestCase):
@@ -93,18 +99,23 @@ class RecipeModelTestCase(TestCase):
         self.assertIsNotNone(recipe.created_at)
 
     def tearDown(self):
-        for recipe in RecipeModel.objects.all():
-            recipe.delete()
+        RecipeModel.objects.all().delete()
 
 
 class RecipeFactoryTestCase(TestCase):
-    def test_create_recipe_with_factory(self):
-        recipe = RecipeFactory()
-        self.assertIsNotNone(recipe.pk)
-        self.assertIn(recipe.cooking_time, ['10 minutes', '30-40 minutes'])
+    def setUp(self):
+        self.recipe = RecipeFactory()
 
-        fetched_recipe = RecipeModel.objects.get(pk=recipe.pk)
-        self.assertEqual(fetched_recipe.name, recipe.name)
+    def test_create_recipe_with_factory(self):
+        self.assertIsNotNone(self.recipe.pk)
+        self.assertIn(self.recipe.cooking_time,
+                      ['10 minutes', '30-40 minutes'])
+
+        fetched_recipe = RecipeModel.objects.get(pk=self.recipe.pk)
+        self.assertEqual(fetched_recipe.name, self.recipe.name)
+
+    def tearDown(self):
+        RecipeModel.objects.first().delete()
 
 
 if __name__ == '__main__':
