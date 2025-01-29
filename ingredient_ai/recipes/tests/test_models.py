@@ -1,4 +1,5 @@
 import io
+import unittest
 
 from PIL import Image
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -15,7 +16,7 @@ from ..models import IngredientCategoryModel, IngredientModel, RecipeModel
 
 def generate_test_image():
     img = Image.new('RGB', (100, 100), color=(255, 0, 0))
-    img_io = io.BytesIO()
+    img_io = io.BytesIO()  # creates an in-memory byte stream (treat as file)
     img.save(img_io, format='JPEG')
     img_io.seek(0)
 
@@ -104,3 +105,7 @@ class RecipeFactoryTestCase(TestCase):
 
         fetched_recipe = RecipeModel.objects.get(pk=recipe.pk)
         self.assertEqual(fetched_recipe.name, recipe.name)
+
+
+if __name__ == '__main__':
+    unittest.main()
