@@ -1,8 +1,10 @@
 import json
+from json import JSONDecodeError
 
 from django.contrib.sessions.backends.db import SessionStore
 from django.core.cache import cache
 from django.core.handlers.wsgi import WSGIRequest
+from django.db import IntegrityError
 from django.db.models import QuerySet
 from ollama import chat
 
@@ -32,7 +34,11 @@ def get_ai_response(prompt: str) -> str:
 
 
 def save_generated_recipes(response: str) -> None:
-    recipes_data = json.loads(response)
+    try:
+        recipes_data = json.loads(response)
+    except JSONDecodeError as e:
+        print(f'Error decoding JSON response: {e}')
+        return
 
     for recipe_data in recipes_data.get('recipes', []):
         name = recipe_data.get('recipe_name', '')
@@ -61,16 +67,20 @@ def create_recipe(
         ingredients: str,
         instructions: str
 ) -> RecipeModel:
-    recipe = RecipeModel.objects.create(
-        name=name,
-        cooking_time=cooking_time,
-        serving_size=serving_size,
-        description=description,
-        ingredients=ingredients,
-        instructions=instructions,
-    )
+    try:
+        recipe = RecipeModel.objects.create(
+            name=name,
+            cooking_time=cooking_time,
+            serving_size=serving_size,
+            description=description,
+            ingredients=ingredients,
+            instructions=instructions,
+        )
 
-    return recipe
+        return recipe
+    except IntegrityError:
+        print(f'Recipe with name "{name}" already exists. Skipping.')
+        return None
 
 
 def get_selected_ingredients(session: SessionStore) -> list[str]:
@@ -88,6 +98,9 @@ def get_recipes(
         user_id: int,
         selected_ingredients: list[str]
 ) -> QuerySet[RecipeModel]:
+    if not selected_ingredients:
+        return RecipeModel.objects.none()
+
     if user_id is not None:
         ingredients = '_'.join(selected_ingredients).lower()
         cache_key = f'recipes_with_{ingredients}_by_{user_id}'

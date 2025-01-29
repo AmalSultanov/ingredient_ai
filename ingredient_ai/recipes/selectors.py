@@ -12,6 +12,9 @@ def get_categories_with_ingredients() -> QuerySet[IngredientCategoryModel]:
 def get_recipes_by_ingredients(
         selected_ingredients: list[str]
 ) -> QuerySet[RecipeModel]:
+    if not selected_ingredients:
+        return RecipeModel.objects.none()
+
     query = Q()
 
     for ingredient in selected_ingredients:
