@@ -3,6 +3,11 @@
 {% block content %}
     <div class="container">
         <h2>Register an account</h2>
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                {{ form.errors }}
+            </div>
+        {% endif %}
         <form method="post">
             {% csrf_token %}
             {{ form.as_p }}

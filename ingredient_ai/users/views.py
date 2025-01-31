@@ -1,6 +1,9 @@
 from django.contrib.auth import login
+from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect, render
+from django.urls import reverse_lazy
+from django.views.generic import CreateView
 
 from .forms import RegistrationForm
 from .services import add_to_wishlist, delete_from_wishlist, get_wishlist
@@ -10,20 +13,17 @@ class CustomLoginView(LoginView):
     template_name = 'users/registration/login.html'
 
 
-def registration_view(request):
-    if request.method == 'POST':
-        form = RegistrationForm(request.POST)
+class RegistrationCreateView(CreateView):
+    model = User
+    form_class = RegistrationForm
+    template_name = 'users/registration/registration.html'
+    success_url = reverse_lazy('recipes:ingredients')
 
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
+    def form_valid(self, form):
+        user = form.save()
+        login(self.request, user)
 
-            return redirect('/')
-
-    form = RegistrationForm()
-    context = {'form': form}
-
-    return render(request, 'users/registration/registration.html', context)
+        return redirect(self.success_url)
 
 
 def add_to_wishlist_view(request, pk):
