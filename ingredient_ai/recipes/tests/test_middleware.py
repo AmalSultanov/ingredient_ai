@@ -5,6 +5,8 @@ from django.core.cache import cache
 from django.test import TestCase
 from django.urls import reverse
 
+from ..models import RecipeModel
+
 
 class ClearRecipeCacheMiddlewareTestCase(TestCase):
     def setUp(self):
@@ -25,8 +27,8 @@ class ClearRecipeCacheMiddlewareTestCase(TestCase):
         self.client.login(username='test-user', password='password')
         self.client.post(self.recipes_url,
                          {'ingredient': ['tomato', 'cheese']})
-        response = self.client.get(reverse('users:wishlist'))
         user_cache_key = f'user_recipes_key_{self.user.id}'
+        response = self.client.get(reverse('users:wishlist'))
 
         self.assertIsNone(cache.get(user_cache_key))
 
@@ -39,6 +41,7 @@ class ClearRecipeCacheMiddlewareTestCase(TestCase):
 
     def tearDown(self):
         User.objects.first().delete()
+        RecipeModel.objects.all().delete()
         cache.clear()
 
 
@@ -49,16 +52,18 @@ class ClearIngredientsMiddlewareTestCase(TestCase):
                                              password='password')
 
     def test_clear_selected_ingredients_in_session_on_non_recipes_page(self):
-        self.client.session['selected_ingredients'] = ['tomato', 'cheese']
-        self.client.session.save()
+        session = self.client.session
+        session['selected_ingredients'] = ['tomato', 'cheese']
+        session.save()
         response = self.client.get(reverse('recipes:ingredients'))
 
         self.assertNotIn('selected_ingredients', self.client.session)
 
     def test_do_not_clear_selected_ingredients_on_recipes_page(self):
         self.client.force_login(self.user)
-        self.client.session['selected_ingredients'] = ['tomato', 'cheese']
-        self.client.session.save()
+        session = self.client.session
+        session['selected_ingredients'] = ['tomato', 'cheese']
+        session.save()
         response = self.client.post(self.recipes_url,
                                     {'ingredient': ['tomato', 'cheese']})
 
@@ -66,15 +71,9 @@ class ClearIngredientsMiddlewareTestCase(TestCase):
         self.assertEqual(self.client.session['selected_ingredients'],
                          ['tomato', 'cheese'])
 
-    def test_clear_selected_ingredients_when_no_condition_met(self):
-        self.client.session['selected_ingredients'] = ['tomato', 'cheese']
-        self.client.session.save()
-        response = self.client.get(reverse('recipes:ingredients'))
-
-        self.assertNotIn('selected_ingredients', self.client.session)
-
     def tearDown(self):
         User.objects.first().delete()
+        RecipeModel.objects.all().delete()
         self.client.session.flush()
 
 
