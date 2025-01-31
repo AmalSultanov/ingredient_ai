@@ -31,4 +31,5 @@ class RecipeView(View):
         selected_ingredients = get_selected_ingredients(request.session)
         recipes = get_recipes(user_id=request.user.id,
                               selected_ingredients=selected_ingredients)
+
         return render(request, self.template_name, {'recipes': recipes})
