@@ -6,7 +6,7 @@ from django.urls import reverse, resolve
 from ..views import get_ingredients_view, RecipeView
 
 
-class UrlsTestCase(SimpleTestCase):
+class UrlsSimpleTestCase(SimpleTestCase):
     def test_ingredients_url_resolves(self):
         url = reverse('recipes:ingredients')
         self.assertEqual(resolve(url).func, get_ingredients_view)
