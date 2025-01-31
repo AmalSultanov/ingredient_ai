@@ -25,8 +25,7 @@ class ViewsTestCase(TestCase):
         self.assertTrue(RecipeModel.objects.exists())
 
     def tearDown(self):
-        RecipeModel.objects.all().delete() if RecipeModel.objects.exists() \
-            else None
+        RecipeModel.objects.all().delete()
 
 
 if __name__ == '__main__':
