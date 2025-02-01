@@ -6,7 +6,7 @@ from ..models import IngredientCategoryModel, RecipeModel
 from ..selectors import (
     get_categories_with_ingredients,
     get_recipes_by_ingredients,
-    get_recipes_by_ids,
+    get_recipes_by_ids
 )
 
 
