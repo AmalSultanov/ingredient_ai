@@ -1,6 +1,9 @@
 from pathlib import Path
 
+import sentry_sdk
 from decouple import config
+
+from .logging import LOGGING
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -8,7 +11,7 @@ SECRET_KEY = config('SECRET_KEY')
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -141,5 +144,14 @@ AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
 AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
 # AWS_S3_FILE_OVERWRITE = False
 AWS_LOCATION = 'static'
+
+sentry_sdk.init(
+    dsn=config('SENTRY_DSN'),
+    send_default_pii=True,
+    traces_sample_rate=1.0,
+    _experiments={
+        'continuous_profiling_auto_start': True,
+    },
+)
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

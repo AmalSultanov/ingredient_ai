@@ -1,4 +1,5 @@
 import json
+import logging
 from json import JSONDecodeError
 
 from django.contrib.sessions.backends.db import SessionStore
@@ -11,6 +12,8 @@ from ollama import chat
 from .models import RecipeModel
 from .selectors import get_recipes_by_ingredients
 from .utils import get_prompt_file
+
+logger = logging.getLogger(__name__)
 
 
 def generate_and_save_recipes(selected_ingredients: list[str]) -> None:
@@ -28,6 +31,7 @@ def get_ai_response(prompt: str) -> str:
             'content': prompt,
         }]
     )
+    logger.info('Received AI response')
     content = response['message']['content']
 
     return content
@@ -35,11 +39,14 @@ def get_ai_response(prompt: str) -> str:
 
 def save_generated_recipes(response: str) -> None:
     try:
+        logger.info('Saving generated recipes')
         recipes_data = json.loads(response)
     except JSONDecodeError as e:
-        print(f'Error decoding JSON response: {e}')
+        logger.error(f'Error decoding JSON response: {e}')
+
         return
 
+    logger.info(f'Saving {len(recipes_data.get('recipes', []))} recipe(s)')
     for recipe_data in recipes_data.get('recipes', []):
         name = recipe_data.get('recipe_name', '')
         cooking_time = recipe_data.get('cooking_time', '')
@@ -76,10 +83,12 @@ def create_recipe(
             ingredients=ingredients,
             instructions=instructions,
         )
+        logger.info(f'Recipe created: {name}')
 
         return recipe
     except IntegrityError:
-        print(f'Recipe with name "{name}" already exists. Skipping.')
+        logger.error(f'Recipe with name "{name}" already exists. Skipping')
+
         return None
 
 
@@ -99,19 +108,27 @@ def get_recipes(
         selected_ingredients: list[str]
 ) -> QuerySet[RecipeModel]:
     if not selected_ingredients:
+        logger.warning('No ingredients selected, returning empty queryset')
+
         return RecipeModel.objects.none()
 
     if user_id is not None:
         ingredients = '_'.join(selected_ingredients).lower()
         cache_key = f'recipes_with_{ingredients}_by_{user_id}'
+        logger.info(f'Checking cache for key: {cache_key}')
         recipes = cache.get(cache_key)
 
         if recipes is None:
+            logger.info(f'Cache miss for key: {cache_key}. '
+                        f'Generating and saving recipes')
             generate_and_save_recipes(selected_ingredients)
             recipes = get_recipes_by_ingredients(selected_ingredients)
 
             cache.set(cache_key, recipes, timeout=None)
+        else:
+            logger.info(f'Cache hit for key: {cache_key}')
     else:
+        logger.info('No user ID provided, generating recipes')
         generate_and_save_recipes(selected_ingredients)
         recipes = get_recipes_by_ingredients(selected_ingredients)
 

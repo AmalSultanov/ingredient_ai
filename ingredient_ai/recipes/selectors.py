@@ -1,6 +1,10 @@
+import logging
+
 from django.db.models import Q, QuerySet
 
 from .models import IngredientCategoryModel, RecipeModel
+
+logger = logging.getLogger(__name__)
 
 
 def get_categories_with_ingredients() -> QuerySet[IngredientCategoryModel]:
@@ -13,6 +17,8 @@ def get_recipes_by_ingredients(
         selected_ingredients: list[str]
 ) -> QuerySet[RecipeModel]:
     if not selected_ingredients:
+        logger.warning('No ingredients provided, returning empty QuerySet')
+
         return RecipeModel.objects.none()
 
     query = Q()
