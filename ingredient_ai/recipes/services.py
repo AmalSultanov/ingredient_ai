@@ -89,20 +89,34 @@ def prepare_new_recipes(
 
     for recipe_data in recipes:
         name = recipe_data.get('recipe_name', '')
-        if name in existing_recipes:
-            logger.info(f'Skipping existing recipe: {name}')
+        description = recipe_data.get('description', '')
+        filtered_description = description.replace('[', '').replace(']', '')
+        instructions = recipe_data.get('instructions', [])
+
+        if name in existing_recipes or not is_valid_list(instructions):
+            logger.warning(f'Skipping existing recipe: {name} '
+                           f'(Already exists or invalid instructions)')
             continue
 
         new_recipes.append(RecipeModel(
             name=name,
             cooking_time=recipe_data.get('cooking_time', ''),
             serving_size=recipe_data.get('serving_size', ''),
-            description=recipe_data.get('description', ''),
+            description=filtered_description,
             ingredients='\n'.join(recipe_data.get('ingredients', [])),
             instructions='\n'.join(recipe_data.get('instructions', []))
         ))
 
     return new_recipes
+
+
+def is_valid_list(value: Any) -> bool:
+    return (isinstance(value, list) and
+            all(
+                len(item) > 1 and
+                any(c.isalnum() for c in item)
+                for item in value if isinstance(item, str)
+            ))
 
 
 def insert_new_recipes(new_recipes: list[RecipeModel]) -> None:
