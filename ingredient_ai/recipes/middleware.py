@@ -27,7 +27,9 @@ class ClearRecipeCacheMiddleware:
         elif not (
                 request.path == self.recipes_url or
                 request.path.startswith('/users/add') or
-                request.path.startswith('/users/delete')
+                request.path.startswith('/users/delete') or
+                request.path.startswith('/loading') or
+                request.path.startswith('/check-recipes')
         ) and user_cache_key in cache:
             cache_key = cache.get(user_cache_key)
             cache.delete(cache_key)
@@ -48,7 +50,9 @@ class ClearIngredientsMiddleware:
             if not (
                     request.path == reverse('recipes:recipes') or
                     request.path.startswith('/users/add') or
-                    request.path.startswith('/users/delete')
+                    request.path.startswith('/users/delete') or
+                    request.path.startswith('/loading') or
+                    request.path.startswith('/check-recipes')
             ):
                 logger.info(f'Clearing selected_ingredients '
                             f'from session for user {request.user.id}')
