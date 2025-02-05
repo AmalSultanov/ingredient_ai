@@ -23,7 +23,6 @@
                             </h5>
                             <p class="card-text"><strong>Cooking Time:</strong> {{ recipe.cooking_time }}</p>
                             <p class="card-text"><strong>Serving Size:</strong> {{ recipe.serving_size }}</p>
-                            <p class="card-text text-truncate" style="max-width: 300px;"><strong>Description:</strong> {{ recipe.description }}</p>
                         </div>
                         <div class="card-footer">
                             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#recipeModal{{ recipe.id }}">
@@ -41,6 +40,11 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
+                                {% if recipe.image %}
+                                    <img src="{{ recipe.image.url }}" class="img-fluid d-block mx-auto mb-3" alt="{{ recipe.name }}">
+                                {% else %}
+                                    <img src="https://placehold.co/600x400" class="img-fluid d-block mx-auto mb-3" alt="Placeholder image">
+                                {% endif %}
                                 <p><strong>Cooking Time:</strong> {{ recipe.cooking_time }}</p>
                                 <p><strong>Serving Size:</strong> {{ recipe.serving_size }}</p>
                                 <p><strong>Description:</strong> {{ recipe.description }}</p>
