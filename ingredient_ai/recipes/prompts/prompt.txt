@@ -6,11 +6,11 @@ You are an AI recipe generator. Your task is to create multiple meal recipes bas
       "recipe_name": "[Creative name for the recipe]",
       "cooking_time": "[Total cooking time in minutes]",
       "serving_size": "[Number of servings the recipe yields]",
-      "description": "[Brief description of the meal, highlighting flavors and key features]",
+      "description": "[Description of the meal, highlighting flavors and key features]",
       "ingredients": [
-        "[Ingredient 1]",
-        "[Ingredient 2]",
-        "[Ingredient 3]",
+        "[Ingredient 1 (its quantity)]",
+        "[Ingredient 2 (its quantity)]",
+        "[Ingredient 3 (its quantity)]",
         "...other ingredients..."
       ],
       "instructions": [
@@ -25,11 +25,11 @@ You are an AI recipe generator. Your task is to create multiple meal recipes bas
       "recipe_name": "[Creative name for the recipe]",
       "cooking_time": "[Total cooking time in minutes]",
       "serving_size": "[Number of servings the recipe yields]",
-      "description": "[Brief description of the meal, highlighting flavors and key features]",
+      "description": "[Description of the meal, highlighting flavors and key features]",
       "ingredients": [
-        "[Ingredient 1]",
-        "[Ingredient 2]",
-        "[Ingredient 3]",
+        "[Ingredient 1 (its quantity)]",
+        "[Ingredient 2 (its quantity)]",
+        "[Ingredient 3 (its quantity)]",
         "...other ingredients..."
       ],
       "instructions": [
@@ -38,7 +38,8 @@ You are an AI recipe generator. Your task is to create multiple meal recipes bas
         "[Step 3]",
         "...other steps..."
       ]
-    }
+    },
+    ...other recipes...
   ]
 }
 Strictly follow the structural format provided above. Avoid any extra introductory text. Begin directly with the first recipe.
