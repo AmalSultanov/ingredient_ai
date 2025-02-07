@@ -5,6 +5,7 @@ from typing import Optional, Any
 
 from django.contrib.sessions.backends.db import SessionStore
 from django.core.cache import cache
+from django.core.exceptions import ValidationError
 from django.core.handlers.wsgi import WSGIRequest
 from django.db.models import QuerySet
 from ollama import chat
@@ -12,6 +13,7 @@ from ollama import chat
 from .models import RecipeModel
 from .selectors import get_recipes_by_ingredients
 from .utils import get_prompt_file
+from .validators import validate_recipe_data
 
 logger = logging.getLogger(__name__)
 
@@ -46,8 +48,20 @@ def save_generated_recipes(response: str) -> None:
         return
 
     existing_recipes = get_existing_recipe_names(recipes)
-    new_recipes = prepare_new_recipes(recipes=recipes,
-                                      existing_recipes=existing_recipes)
+    valid_recipes = []
+
+    for recipe in recipes:
+        try:
+            validate_recipe_data(recipe, existing_recipes)
+            valid_recipes.append(recipe)
+        except ValidationError as e:
+            logger.warning(f'Skipping invalid recipe: {e}')
+
+    if not valid_recipes:
+        logger.info('No valid recipes to save')
+        return
+
+    new_recipes = prepare_new_recipes(recipes=valid_recipes)
 
     if new_recipes:
         insert_new_recipes(new_recipes)
@@ -79,27 +93,16 @@ def get_existing_recipe_names(recipes: list[dict[str, Any]]) -> set[str]:
     return existing_recipes
 
 
-def prepare_new_recipes(
-        *,
-        recipes: list[dict[str, Any]],
-        existing_recipes: set[str]
-) -> list[RecipeModel]:
+def prepare_new_recipes(*, recipes: list[dict[str, Any]]) -> list[RecipeModel]:
     new_recipes = []
     logger.info(f'Saving {len(recipes)} recipe(s)')
 
     for recipe_data in recipes:
-        name = recipe_data.get('recipe_name', '')
         description = recipe_data.get('description', '')
         filtered_description = description.replace('[', '').replace(']', '')
-        instructions = recipe_data.get('instructions', [])
-
-        if name in existing_recipes or not is_valid_list(instructions):
-            logger.warning(f'Skipping existing recipe: {name} '
-                           f'(Already exists or invalid instructions)')
-            continue
 
         new_recipes.append(RecipeModel(
-            name=name,
+            name=recipe_data.get('recipe_name', ''),
             cooking_time=recipe_data.get('cooking_time', ''),
             serving_size=recipe_data.get('serving_size', ''),
             description=filtered_description,
@@ -108,15 +111,6 @@ def prepare_new_recipes(
         ))
 
     return new_recipes
-
-
-def is_valid_list(value: Any) -> bool:
-    return (isinstance(value, list) and
-            all(
-                len(item) > 1 and
-                any(c.isalnum() for c in item)
-                for item in value if isinstance(item, str)
-            ))
 
 
 def insert_new_recipes(new_recipes: list[RecipeModel]) -> None:
