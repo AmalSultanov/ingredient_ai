@@ -13,7 +13,6 @@ from ..services import (
     generate_and_save_recipes,
     get_ai_response,
     load_recipes_data,
-    is_valid_list,
     get_existing_recipe_names,
     prepare_new_recipes,
     cache_recipes
@@ -70,13 +69,6 @@ class ServicesTestCase(TestCase):
 
         self.assertIsNone(data)
 
-    def test_is_valid_list(self):
-        valid_list = ['Step 1: Do something', 'Step 2: Finish']
-        invalid_list = ['', '[]', '   ']
-
-        self.assertTrue(is_valid_list(valid_list))
-        self.assertFalse(is_valid_list(invalid_list))
-
     def test_get_existing_recipe_names(self):
         RecipeModel.objects.create(name='Tomato Pasta')
         existing_names = get_existing_recipe_names(
@@ -87,7 +79,6 @@ class ServicesTestCase(TestCase):
         self.assertNotIn('Cheese Pizza', existing_names)
 
     def test_prepare_new_recipes(self):
-        existing_recipes = {'Tomato Pasta'}
         recipes = [
             {'recipe_name': 'Tomato Pasta',
              'description': 'Delicious',
@@ -96,11 +87,10 @@ class ServicesTestCase(TestCase):
              'description': 'Yummy',
              'instructions': ['Bake cheese']}
         ]
-        new_recipes = prepare_new_recipes(recipes=recipes,
-                                          existing_recipes=existing_recipes)
+        new_recipes = prepare_new_recipes(recipes=recipes)
 
-        self.assertEqual(len(new_recipes), 1)
-        self.assertEqual(new_recipes[0].name, 'Cheese Pizza')
+        self.assertEqual(len(new_recipes), 2)
+        self.assertEqual(new_recipes[0].name, 'Tomato Pasta')
 
     def test_cache_recipes(self):
         mock_recipes = [{'name': 'Tomato Soup'}]
