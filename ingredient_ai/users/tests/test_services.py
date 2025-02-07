@@ -34,9 +34,9 @@ class ServicesTestCase(TestCase):
         self.assertNotIn(self.recipe_id, wishlist)
 
     def test_get_wishlist(self):
-        self.cache.set(self.key, {1})
         recipe = RecipeModel.objects.create(name='Apple Pie',
                                             ingredients='apple, sugar, flour')
+        self.cache.set(self.key, {recipe.id})
         wishlist = get_wishlist(self.user_id)
 
         self.assertIn(recipe, wishlist)

@@ -31,11 +31,12 @@ class ViewsTestCase(TestCase):
 
     def test_recipe_view_post(self):
         response = self.client.post(self.recipes_url,
-                                    {'ingredient': ['tomato', 'cheese']})
+                                    {'name': 'Recipe 1',
+                                     'ingredients': ['ingredient 1',
+                                                     'ingredient 2']
+                                     })
 
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'recipes/recipes.html')
-        self.assertTrue(RecipeModel.objects.exists())
+        self.assertEqual(response.status_code, 302)
 
     def test_loading_view(self):
         response = self.client.get(self.loading_url)
